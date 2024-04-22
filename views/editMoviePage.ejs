@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Movie Application
+        </title>
+        <style>
+            .table{
+                border-collapse: collapse;
+            }
+            .table tr th, .table tr td{
+                border: 1px solid #099999;
+            }
+            .table tr th{
+                background-color: aliceblue;
+            }
+        </style>
+    </head>
+    <body>
+        <h2 align="center">Edit Movie </h2>
+        <form action="/updatemovie/:movieId" method="post" enctype="application/x-www-form-urlencoded">
+            <input type="hidden" name="_method" value="PUT"/>
+            <input type="hidden" name="movieId" value="<%= movieData._id %>" />
+            <table align="center" class="table">
+                <tr>
+                    <td>Movie Name</td>
+                    <td><input type="text" name="title" value="<%= movieData.title %>"></td>
+                </tr>
+                <tr>
+                    <td>Movie Release Year</td>
+                    <td><input type="text" name="year" value="<%= movieData.year %>"></td>
+                </tr>
+                <tr>
+                    <td>Movie Production Company</td>
+                    <td><input type="text" name="movieProductionCompany" value="<%= movieData.movieProductionCompany %>"></td>
+                </tr>
+                <tr>
+                    <td>Movie Genre</td>
+                    <td><input type="text" name="movieGenre" value="<%= movieData.movieGenre %>"></td>
+                </tr>
+                <tr>
+                    <td>Movie Runtime</td>
+                    <td><input type="text" name="movieRuntime" value="<%= movieData.movieRuntime %>"></td>
+                </tr>
+                <tr>
+                    <td>Movie Director</td>
+                    <td><input type="text" name="movieDirector" value="<%= movieData.movieDirector %>"></td>
+                </tr>
+                <tr>
+                    <td>Movie Description</td>
+                    <td><input type="text" name="movieDescription" value="<%= movieData.movieDescription %>"></td>
+                </tr>
+                <tr>
+                    <td>Movie Img</td>
+                    <td><input type="text" name="movieImg" value="<%= movieData.movieImg %>"></td>
+                </tr>
+                <tr>
+                    <td>Movie Image Content Type</td>
+                    <td><input type="text" name="movieImageContentType"value="<%= movieData.movieImageContentType %>"></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><button type="submit" name="Submit">Update</button></td>
+                </tr>
+            </table>
+    </form>
+    </body>
+</html>
