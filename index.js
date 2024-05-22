@@ -8,7 +8,6 @@ const config = require('./config.js');
 const movieRouter = require('./routes/movies.js');
 const methodOverride = require('method-override');
 
-
 app.use(methodOverride(function(req, res){
   if(req.body && typeof req.body === 'object' && '_method' in req.body){
       var method = req.body._method;

@@ -4,6 +4,7 @@
         <title>
             Movie Application
         </title>
+        <script src="/assets/js/jquery-3.7.1.js"></script>
         <style>
             .table{
                 border-collapse: collapse;
@@ -18,7 +19,7 @@
     </head>
     <body>
         <h2 align="center">Edit Movie </h2>
-        <form action="/updatemovie/:movieId" method="post" enctype="application/x-www-form-urlencoded">
+        <form action="" method="post" enctype="multipart/form-data" id="editMovieForm">
             <input type="hidden" name="_method" value="PUT"/>
             <input type="hidden" name="movieId" value="<%= movieData._id %>" />
             <table align="center" class="table">
@@ -51,8 +52,8 @@
                     <td><input type="text" name="movieDescription" value="<%= movieData.movieDescription %>"></td>
                 </tr>
                 <tr>
-                    <td>Movie Img</td>
-                    <td><input type="text" name="movieImg" value="<%= movieData.movieImg %>"></td>
+                    <td>Movie Poster</td>
+                    <td><input type="file" name="movieImgEdit" <img src="/getPoster/<%= movies[i]._id %>" width="50" height="50" /></td>
                 </tr>
                 <tr>
                     <td>Movie Image Content Type</td>
@@ -63,5 +64,22 @@
                 </tr>
             </table>
     </form>
+    <script>
+        $(document).ready(function(){
+            $("#editMovieForm").submit(function(e){
+                $.ajax({
+                    url: '/updatemovie/:movieId',
+                    type: 'PUT',
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: function(data){
+                    console.log(data)
+                    }
+                })
+                e.preventDefault()
+            })
+        })
+    </script>
     </body>
 </html>
