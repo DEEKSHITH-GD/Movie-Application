@@ -5,9 +5,11 @@
     <style>
         /* Your CSS styles can go here */
     </style>
+    <script src="/assets/js/jquery-3.7.1.js"></script>
+    <script src="/assets/js/jquery.validate.min.js"></script>
 </head>
 <body>
-    <form action="/addmovie" method="post" enctype="multipart/form-data">
+    <form action="/addmovie" method="post" enctype="multipart/form-data" id="addMovieForm">
         <table align="center">
             <thead>
                 <tr>
@@ -75,10 +77,10 @@
                 </tr>
                 <tr>
                     <td>
-                        <label for="movieImageContentType">Movie Image Content Type:</label>
+                        <label for="rating">Rating:</label>
                     </td>
                     <td>
-                        <input type="text" id="movieImageContentType" name="movieImageContentType" required><br><br>
+                        <input type="text" id="rating" name="rating" required><br><br>
                     </td>
                 </tr>
                 <tr>
@@ -96,6 +98,11 @@
                 </tr>
             </tbody>
         </table>
-    </form>      
+    </form>     
+    <script>
+        $(document).ready(function(){
+            $("#addMovieForm").validate()
+        })
+    </script> 
 </body>
 </html>

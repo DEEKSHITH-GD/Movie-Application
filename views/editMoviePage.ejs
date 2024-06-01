@@ -5,6 +5,7 @@
             Movie Application
         </title>
         <script src="/assets/js/jquery-3.7.1.js"></script>
+        <script src="/assets/js/jquery.validate.min.js"></script>
         <style>
             .table{
                 border-collapse: collapse;
@@ -56,8 +57,8 @@
                     <td><input type="file" name="movieImgEdit" /><img src="/getPoster/<%= movieData._id %>" width="180" height="200" /></td>
                 </tr>
                 <tr>
-                    <td>Movie Image Content Type</td>
-                    <td><input type="text" name="movieImageContentType"value="<%= movieData.movieImageContentType %>"></td>
+                    <td>Rating</td>
+                    <td><input type="text" name="rating" value="<%= movieData.rating %>"></td>
                 </tr>
                 <tr>
                     <td colspan="2"><button type="submit" name="Submit">Update</button></td>
@@ -66,20 +67,29 @@
     </form>
     <script>
         $(document).ready(function(){
+            $("#editMovieForm").validate({
+                
+            })
             $("#editMovieForm").submit(function(e){
+                e.preventDefault();
+                const movieId = $("input[name='movieId']").val();
+                const formData = new FormData(this);
                 $.ajax({
-                    url: '/updatemovie/:movieId',
-                    type: 'PUT',
-                    data: new FormData(this),
+                    url: '/updatemovie/' + movieId,
+                    type: 'POST',
+                    data: formData,
                     processData: false,
                     contentType: false,
                     success: function(data){
-                    console.log(data)
+                        console.log(data);
+                        window.location.href = '/'
+                    },
+                    error: function(err) {
+                        console.error(err);
                     }
-                })
-                e.preventDefault()
-            })
-        })
+                });
+            });
+        });
     </script>
     </body>
 </html>

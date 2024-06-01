@@ -40,7 +40,7 @@
                     <th><strong>movie Director</strong></th>
                     <th><strong>movie Description</strong></th>
                     <th><strong>Poster</strong></th>
-                    <th><strong>movie Image Content Type</strong></th>
+                    <th><strong>Rating</strong></th>
                     <th><strong>Actions</strong></th>
                 </tr>
             </thead>
@@ -56,8 +56,21 @@
                         <td><%= movies[i].movieRuntime %></td>
                         <td><%= movies[i].movieDirector %></td>
                         <td><%= movies[i].movieDescription %></td>
-                        <td><img src="/getPoster/<%= movies[i]._id %>" width="180" height="200"/></td>
-                        <td><%= movies[i].movieImageContentType %></td>
+                        <td><img src="/getPoster/<%= movies[i]._id %>" width="220" height="270"/></td>
+                        <td><%= movies[i].rating %></td>
+                        <td align="center">
+                            <%
+                                if(movies[i].totalreviews.length>0) {
+                            %>
+                            <a href="/reviewlist/<%=movies[i]._id%>"><%=movies[i].totalreviews.length%></a>
+                            <%
+                                }else{
+                            %>
+                            <strong><%=movies[i].totalreviews.length%></strong>
+                            <%
+                                }
+                            %>
+                        </td>
                         <td>
                             <a href="/editmovie/<%= movies[i]._id %>"><i class="fas fa-edit fa-lg" style="color: blue;"></i></a></a>
                             <a href="#" onclick="deleteMovie('<%= movies[i]._id %>')"><i class="fas fa-trash-alt fa-lg" style="color: red;"></i></a>

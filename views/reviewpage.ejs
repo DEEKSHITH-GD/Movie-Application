@@ -1,0 +1,62 @@
+<h3 class="ui-dialog-title pull-left"><%= moviedata.title %></h3>
+<div class="message-wrap col-lg-12">
+    <div class="msg-wrap">
+        <% let reviewList = moviedata.allreviews;
+           if (reviewList.length > 0) {
+               for (let i = 0; i < reviewList.length; i++) {
+        %>
+        <div class="media msg">
+            <a href="#" class="pull-left">
+                <img src="/assets/images/user-icon.png" alt="user profile" class="media-object" style="width: 32px; height: 32px;">
+            </a>
+            <div class="media-body">
+                <small class="pull-left"><%= reviewList[i].username %></small>
+                <h5 class="media-heading"><%= reviewList[i].reviewtitle %></h5>&nbsp;&nbsp;&nbsp;&nbsp;
+                <small class="col-lg-12"><%= reviewList[i].reviewdesc %></small>
+            </div><br>
+        </div>
+        <%
+               }
+           } else {
+        %>
+            <p>No reviews available.</p>
+        <% } %>
+    </div>
+</div><br>
+<form action="/savereview" method="post" id="reviewForm">
+    <input type="hidden" name="movieId" value="<%= moviedata._id %>" />
+    <table width="100%" align="center">
+        <tr>
+            <td colspan="2">
+                <p class="error">All form fields are required</p><br>
+            </td>
+            <td rowspan="5"><img src="/getPoster/<%= moviedata._id %>" class="pull-right" width="250" height="290" alt="movie poster" /></td>
+        </tr>
+        <tr>
+            <td>Your Name: <span class="error">*</span></td>
+            <td><input type="text" name="username" id="username" class="text ui-widget-content ui-corner-all"></td>
+        </tr>
+        <tr>
+            <td>Review Title: <span class="error">*</span></td>
+            <td><input type="text" name="reviewtitle" id="reviewtitle" class="text ui-widget-content ui-corner-all"></td>
+        </tr>
+        <tr>
+            <td>Review description: <span class="error">*</span></td>
+            <td><textarea name="reviewdesc" id="reviewdesc" class="text ui-widget-content ui-corner-all"></textarea></td>
+        </tr>
+        <tr>
+            <td>Like/Dislike: <span class="error">*</span></td>
+            <td>
+                <input type="radio" name="review" id="review" value="like" class="text ui-widget-content ui-corner-all">
+                <label for="review">Like</label> &nbsp;&nbsp;
+                <input type="radio" name="review" id="review" value="dislike" class="text ui-widget-content ui-corner-all">
+                <label for="review">Dislike</label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="submit" value="Save" class="ui-button ui-corner-all ui-widget">
+            </td>
+        </tr>
+    </table>
+</form>

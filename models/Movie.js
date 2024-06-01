@@ -9,7 +9,7 @@ const movieSchema = new mongoose.Schema({
     movieDirector: String,
     movieDescription: String,
     movieImg: String,
-    movieImageContentType: String
+    rating: String
 });
 
 const Movie = mongoose.model('Movie', movieSchema);

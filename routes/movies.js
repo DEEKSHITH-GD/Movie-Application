@@ -5,8 +5,8 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const { ObjectId } = require('mongodb');
-const app = express();
 
+const app = express();
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 const MAGIC_NUMBERS = {
@@ -17,13 +17,8 @@ const MAGIC_NUMBERS = {
 };
 
 function checkMagicNo(magic) {
-    console.log('Uploaded file magic number:', magic); // Debugging: Log magic number
-    if (magic === MAGIC_NUMBERS.jpg || magic === MAGIC_NUMBERS.jpg1 || magic === MAGIC_NUMBERS.png || magic === MAGIC_NUMBERS.gif) {
-        return true;
-    } else {
-        console.log('Invalid magic number:', magic); // Debugging: Log invalid magic number
-        return false;
-    }
+    console.log('Uploaded file magic number:', magic);
+    return Object.values(MAGIC_NUMBERS).includes(magic);
 }
 
 const imgStorage = multer.diskStorage({
@@ -37,10 +32,16 @@ const imgStorage = multer.diskStorage({
 
 const upload = multer({ storage: imgStorage });
 
-// GET /movies - Get all movies
 router.get('/', async (req, res) => {
     try {
-        const movies = await Movie.find();
+        const movies = await Movie.aggregate([{
+            $lookup: {
+                from: "reviews",
+                localField: "_id",
+                foreignField: "movieId",
+                as: "totalreviews"
+            }
+        }]);
         res.render('index.ejs', { movies: movies });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -52,13 +53,10 @@ router.get('/addmoviepage', (req, res) => {
 });
 
 router.post('/addmovie', upload.single('posterImg'), async (req, res) => {
-    if (err) {
-        console.error('Multer error:', err);  // Log the multer error details
-        return res.status(500).json({ message: 'File upload failed.', error: err.message });
-    } else {
+    if (req.file) {
         try {
             const filePath = path.resolve(__dirname, '../uploads', req.file.filename);
-            console.log('Uploaded file path:', filePath);  // Debugging: Log file path
+            console.log('Uploaded file path:', filePath);
 
             let bitmap = fs.readFileSync(filePath).toString('hex', 0, 4);
 
@@ -76,14 +74,16 @@ router.post('/addmovie', upload.single('posterImg'), async (req, res) => {
                 movieDirector: req.body.movieDirector,
                 movieDescription: req.body.movieDescription,
                 movieImg: req.file.filename,
-                movieImageContentType: req.file.mimetype
+                rating: req.body.rating
             });
 
             res.redirect('/');
         } catch (error) {
-            console.error('Error adding movie:', error);  // Log the error details
+            console.error('Error adding movie:', error);
             res.status(500).json({ message: error.message });
         }
+    } else {
+        res.status(400).json({ message: 'No file provided.' });
     }
 });
 
@@ -121,48 +121,48 @@ router.get('/editmovie/:movieId', async (req, res) => {
 });
 
 router.post('/updatemovie/:movieId', upload.single('movieImgEdit'), async (req, res) => {
-    try {
-        const movieId = req.params.movieId;
-        const movie = await Movie.findById(movieId);
-        if (!movie) {
-            return res.status(404).json({ message: 'Movie not found' });
-        }
-
-        let movieFileName = movie.movieImg;
-        if (req.file) {
-            const filePath = path.join(__dirname, '../uploads', req.file.filename);
-            const bitmap = fs.readFileSync(filePath).toString('hex', 0, 4);
-
-            if (!checkMagicNo(bitmap)) {
-                fs.unlinkSync(filePath);
-                console.log('File is not valid');
-                return res.status(400).json({ message: 'Invalid file format' });
-            } else {
-                console.log('File is uploaded');
-                movieFileName = req.file.filename;
-                if (movie.movieImg) {
-                    fs.unlinkSync(path.join(__dirname, '../uploads', movie.movieImg));
+    if(req.body){
+        try {
+            const movieId = req.params.movieId;
+            const movie = await Movie.findById(movieId);
+            if (!movie) {
+                return res.status(404).json({ message: 'Movie not found' });
+            }
+    
+            let movieFileName = movie.movieImg;
+            if (req.file) {
+                const filePath = path.join(__dirname, '../uploads', req.file.filename);
+                const bitmap = fs.readFileSync(filePath).toString('hex', 0, 4);
+    
+                if (!checkMagicNo(bitmap)) {
+                    fs.unlinkSync(filePath);
+                    return res.status(400).json({ message: 'Invalid file format' });
+                } else {
+                    movieFileName = req.file.filename;
+                    if (movie.movieImg) {
+                        fs.unlinkSync(path.join(__dirname, '../uploads', movie.movieImg));
+                    }
                 }
             }
+    
+            const updatedMovieData = {
+                title: req.body.title,
+                year: req.body.year,
+                movieProductionCompany: req.body.movieProductionCompany,
+                movieGenre: req.body.movieGenre,
+                movieRuntime: req.body.movieRuntime,
+                movieDirector: req.body.movieDirector,
+                movieDescription: req.body.movieDescription,
+                movieImg: movieFileName,
+                movieImageContentType: req.file ? req.file.mimetype : movie.movieImageContentType
+            };
+    
+            await Movie.findByIdAndUpdate(movieId, updatedMovieData, { new: true });
+            res.redirect('/');
+        } catch (error) {
+            console.error('Error updating movie:', error);
+            res.status(500).json({ message: error.message });
         }
-
-        const updatedMovieData = {
-            title: req.body.title,
-            year: req.body.year,
-            movieProductionCompany: req.body.movieProductionCompany,
-            movieGenre: req.body.movieGenre,
-            movieRuntime: req.body.movieRuntime,
-            movieDirector: req.body.movieDirector,
-            movieDescription: req.body.movieDescription,
-            movieImg: movieFileName,
-            movieImageContentType: req.file ? req.file.mimetype : movie.movieImageContentType
-        };
-
-        const updatedMovie = await Movie.findByIdAndUpdate(movieId, updatedMovieData, { new: true });
-        res.redirect('/');
-    } catch (error) {
-        console.error('Error updating movie:', error);
-        res.status(500).json({ message: error.message });
     }
 });
 
@@ -174,6 +174,29 @@ router.delete('/deleteMovie', async (req, res) => {
             return res.status(404).json({ message: 'Movie not found' });
         }
         res.json(deleted);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.get('/reviewlist/:movieId', async(req, res) => {
+    try{
+        let movieID = req.params.movieId
+        if(movieID){
+            const reviewdata = await Movie.aggregate([{
+                $match: {
+                    $and: [{"_id":ObjectId(movieID)}]
+                }
+            },{
+                $lookup: {
+                    from: "reviews",
+                    localField: "_id",
+                    foreignField: "movieId",
+                    as: "reviewslist"
+                }
+            }]);
+            res.render('reviewslist.ejs', { reviewdata: reviewdata });
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
